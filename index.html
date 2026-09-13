@@ -12,7 +12,7 @@
 :root{
   --bg:#07060a; --panel:#14101a; --panel2:#1d1724; --line:#3a2b3f;
   --ink:#ede6f2; --dim:#a294ae; --red:#e0344a; --amber:#ffb547; --green:#4ad07a;
-  --blood:#7c1020;
+  --blue:#6bb8e8; --blood:#7c1020;
 }
 html,body{height:100%}
 body{
@@ -33,33 +33,46 @@ body{
 #items{display:flex; gap:4px}
 .slot{width:30px;height:30px;border-radius:8px;border:1px dashed var(--line);display:grid;place-items:center;font-size:16px;opacity:.3;background:#0d0a11}
 .slot.on{opacity:1;border:1px solid var(--amber);background:#2a1e0c;box-shadow:0 0 10px rgba(255,181,71,.35)}
-#noisewrap{flex:1; min-width:90px; height:10px; background:#241a29; border-radius:999px; overflow:hidden; border:1px solid var(--line)}
+#umbPill{border-color:#6bb8e8;color:#cfe9fb}
+#umbPill.hot{background:#123047;box-shadow:0 0 12px rgba(107,184,232,.45)}
+#noisewrap{flex:1; min-width:70px; height:10px; background:#241a29; border-radius:999px; overflow:hidden; border:1px solid var(--line)}
 #noise{height:100%;width:0;background:linear-gradient(90deg,#4ad07a,#ffb547,#e0344a);transition:width .2s}
 #state{font-weight:700}
 
 /* ---------- canvas ---------- */
-#stage{position:relative; flex:1; min-height:0; display:grid; place-items:center; background:#050409}
+#stage{position:relative; flex:1; min-height:0; display:grid; place-items:center; background:#050409; touch-action:none}
 canvas{display:block; image-rendering:pixelated; touch-action:none; background:#050409}
 #toast{
-  position:absolute; left:50%; bottom:16%; transform:translateX(-50%);
-  background:rgba(10,8,14,.92); border:1px solid var(--line); border-left:3px solid var(--amber);
+  position:absolute; left:50%; top:12px; transform:translateX(-50%);
+  background:rgba(10,8,14,.93); border:1px solid var(--line); border-left:3px solid var(--amber);
   padding:8px 14px; border-radius:10px; font-size:14px; max-width:88%; text-align:center;
-  opacity:0; transition:opacity .25s; pointer-events:none; z-index:4; line-height:1.5;
+  opacity:0; transition:opacity .25s; pointer-events:none; z-index:6; line-height:1.5;
 }
 #toast.show{opacity:1}
 #flash{position:absolute;inset:0;background:var(--blood);opacity:0;pointer-events:none;z-index:5;transition:opacity .12s}
 
-/* ---------- touch controls ---------- */
+/* ---------- 觸控：虛擬搖桿 + 大按鈕 ---------- */
 #touch{position:absolute; inset:0; z-index:4; pointer-events:none; display:none}
 #touch.on{display:block}
-#pad{position:absolute; left:14px; bottom:14px; width:150px; height:150px; pointer-events:auto}
-#pad div{position:absolute;width:50px;height:50px;background:rgba(40,30,50,.75);border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;color:#cbb8d6;font-size:18px}
-#pu{left:50px;top:0}#pd{left:50px;top:100px}#pl{left:0;top:50px}#pr{left:100px;top:50px}
-#act{position:absolute; right:16px; bottom:26px; width:88px; height:88px; border-radius:50%;
-  background:radial-gradient(circle at 35% 30%,#5c2b3a,#2a1420); border:2px solid #7c3247; color:#ffd9e0;
-  font-size:15px; font-weight:700; pointer-events:auto; display:grid; place-items:center}
-#run{position:absolute; right:116px; bottom:40px; width:58px;height:58px;border-radius:50%;
-  background:#241a29;border:1px solid var(--line);color:#cbb8d6;font-size:12px;pointer-events:auto;display:grid;place-items:center}
+#joy{position:absolute; width:132px; height:132px; margin:-66px 0 0 -66px; border-radius:50%;
+  background:radial-gradient(circle,rgba(60,45,72,.5),rgba(30,22,38,.32)); border:2px solid rgba(190,160,205,.38);
+  opacity:0; transition:opacity .12s; pointer-events:none}
+#joy.on{opacity:1}
+#knob{position:absolute; width:56px; height:56px; margin:-28px 0 0 -28px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#8f79a3,#4a3757); border:2px solid #b9a3c9;
+  box-shadow:0 4px 14px rgba(0,0,0,.5); pointer-events:none; opacity:0; transition:opacity .12s}
+#knob.on{opacity:1}
+#act{position:absolute; right:18px; bottom:22px; width:108px; height:108px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#6b3243,#2a1420); border:3px solid #8c3d52; color:#ffd9e0;
+  font-size:17px; font-weight:700; pointer-events:auto; display:grid; place-items:center; text-align:center; line-height:1.3;
+  box-shadow:0 6px 20px rgba(0,0,0,.55)}
+#act:active{transform:scale(.94)}
+#umbBtn{position:absolute; right:140px; bottom:42px; width:74px; height:74px; border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#24506e,#10222f); border:3px solid #3f7ea6; color:#d8eefc;
+  font-size:24px; pointer-events:auto; display:grid; place-items:center; box-shadow:0 4px 16px rgba(0,0,0,.5)}
+#umbBtn small{position:absolute;bottom:6px;right:8px;font-size:12px;font-weight:700;color:#ffd9a0}
+#umbBtn.off{opacity:.32}
+#umbBtn:active{transform:scale(.94)}
 
 /* ---------- overlays ---------- */
 .screen{
@@ -68,12 +81,12 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
   padding:22px; text-align:center; overflow-y:auto;
 }
 .screen.on{display:flex}
-.screen h1{font-family:"Noto Serif TC","Songti TC",serif; font-weight:900; font-size:clamp(26px,6vw,44px); letter-spacing:3px; margin-bottom:6px; text-wrap:balance;
+.screen h1{font-family:"Noto Serif TC","Songti TC",serif; font-weight:900; font-size:clamp(26px,6vw,44px);
+  letter-spacing:3px; margin-bottom:6px; text-wrap:balance;
   background:linear-gradient(#fff,#e0344a); -webkit-background-clip:text; background-clip:text; color:transparent}
 .screen h2{font-family:"Noto Serif TC","Songti TC",serif; font-weight:700; font-size:clamp(20px,5vw,30px); margin-bottom:10px; text-wrap:balance}
 .sub{color:var(--dim); font-size:14px; margin-bottom:16px; line-height:1.7}
 .sub i,.card i{font-family:"Special Elite","Courier New",monospace; font-style:normal; color:#e8d7bd}
-.tag{font-family:"Special Elite","Courier New",monospace}
 .card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px;
   max-width:560px; width:100%; text-align:left; font-size:13.5px; line-height:1.85; color:#d7cadd; margin-bottom:14px}
 .card b{color:var(--amber)}
@@ -82,6 +95,7 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
   box-shadow:0 6px 18px rgba(140,28,48,.35)}
 .btn:active{transform:translateY(1px)}
 .btn.ghost{background:#1d1724;border:1px solid var(--line);color:#cbb8d6;box-shadow:none;font-size:14px;padding:10px 20px}
+.btn.blue{background:linear-gradient(#1d5c80,#0e3145);border-color:#3f7ea6;color:#dff0fb;box-shadow:0 6px 18px rgba(29,92,128,.3)}
 .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .granny-art{font-size:64px;line-height:1;margin-bottom:8px;filter:drop-shadow(0 0 18px rgba(224,52,74,.5))}
 
@@ -92,13 +106,15 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
 #qbox{background:linear-gradient(#181220,#120d19); border:1px solid #45304d; border-radius:16px;
   width:100%; max-width:560px; padding:16px; box-shadow:0 0 40px rgba(0,0,0,.8), 0 0 0 1px rgba(224,52,74,.15)}
 #qtop{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:var(--dim)}
-.tag{background:#2a1e33;border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--amber);font-weight:700}
+.tag{background:#2a1e33;border:1px solid var(--line);border-radius:6px;padding:2px 8px;color:var(--amber);
+  font-weight:700;font-family:"Special Elite","Courier New",monospace}
+#streakTag{color:#4ad07a;font-weight:700;white-space:nowrap}
 #tbarwrap{flex:1;height:6px;background:#241a29;border-radius:999px;overflow:hidden}
 #tbar{height:100%;width:100%;background:linear-gradient(90deg,#4ad07a,#ffb547,#e0344a)}
 #qsrc{font-size:12px;color:#7d6c88;margin-bottom:8px}
 #qtext{font-size:16px; line-height:1.75; margin-bottom:14px; white-space:pre-wrap}
 .opt{display:block;width:100%;text-align:left;background:#221a2b;border:1px solid var(--line);color:var(--ink);
-  padding:11px 13px;border-radius:10px;margin-bottom:8px;font-size:15px;cursor:pointer;font-family:inherit;line-height:1.5}
+  padding:13px;border-radius:10px;margin-bottom:8px;font-size:15px;cursor:pointer;font-family:inherit;line-height:1.5}
 .opt:hover{background:#2c2237}
 .opt.correct{background:#12351f;border-color:#3f8f5c;color:#c9f5d8}
 .opt.wrong{background:#3a1119;border-color:#8c2136;color:#ffc9d2}
@@ -107,7 +123,7 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
   font-size:13.5px;line-height:1.7;color:#d9cbe0;margin-bottom:10px}
 #exp.on{display:block}
 #qfoot{display:flex;justify-content:flex-end}
-#wrongList{max-height:34vh;overflow-y:auto;text-align:left;width:100%;max-width:560px}
+#wrongList{max-height:32vh;overflow-y:auto;text-align:left;width:100%;max-width:560px}
 .wq{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--red);
   border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;line-height:1.7}
 .wq .ans{color:var(--green)}
@@ -117,16 +133,13 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
 <body>
 <div id="app">
   <div id="hud">
+    <span class="pill" id="lvPill">第一關</span>
     <span class="pill">第 <b id="day">1</b>/5 天</span>
     <span class="pill">❤️ <b id="lives">5</b></span>
-    <div id="items">
-      <div class="slot" id="s_hammer" title="鐵鎚">🔨</div>
-      <div class="slot" id="s_key" title="大門鑰匙">🗝️</div>
-      <div class="slot" id="s_code" title="密碼紙條">🔢</div>
-      <div class="slot" id="s_phone" title="你的手機">📱</div>
-    </div>
+    <div id="items"></div>
+    <span class="pill" id="umbPill">🌂 <b id="umbN">0</b></span>
     <div id="noisewrap"><div id="noise"></div></div>
-    <span class="pill" id="state">😴 阿嬤在打盹</span>
+    <span class="pill" id="state">🚶‍♀️ 阿嬤在巡邏</span>
   </div>
 
   <div id="stage">
@@ -134,9 +147,9 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
     <div id="toast"></div>
     <div id="flash"></div>
     <div id="touch">
-      <div id="pad"><div id="pu">▲</div><div id="pl">◀</div><div id="pr">▶</div><div id="pd">▼</div></div>
-      <div id="run">跑</div>
-      <div id="act">搜查<br>E</div>
+      <div id="joy"></div><div id="knob"></div>
+      <div id="umbBtn">🌂<small id="umbBtnN">0</small></div>
+      <div id="act">搜查</div>
     </div>
   </div>
 
@@ -146,20 +159,26 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
     <h1>恐怖阿嬤的英文逃脫</h1>
     <div class="sub">龍騰 B1 Lesson 2　<i>Goodbye, John</i>　單字 × 文法 × 克漏字</div>
     <div class="card">
-      <b>【劇情】</b><br>
-      你的手機被恐怖阿嬤沒收了，還被鎖進她那棟老房子。她手裡永遠握著那把黑雨傘 ——
-      <i>“Each of the hikers brought an umbrella <b>in case</b> it rained.”</i> —— 被打到一下就結束了。<br><br>
-      <b>【目標】</b>找齊 🔨 鐵鎚、🗝️ 鑰匙、🔢 密碼紙條，走到走廊盡頭的大門，通過最後三道英文考驗就能逃出去。<br><br>
-      <b>【玩法】</b>走到家具前按 <b>E</b>（手機按「搜查」）翻找，翻找時要答一題英文。<br>
-      答錯 → <b style="color:#e0344a">巨大聲響！阿嬤立刻朝你衝過來</b>。<br>
-      被雨傘打到 → 昏過去，隔天醒來（少一天）。五天內沒逃出去就被阿嬤「解決」。<br>
-      被追時可躲進 🛏️ 床底或 🧳 衣櫃（按 E）。
+      <b>【劇情】</b>你的手機被恐怖阿嬤沒收，還被鎖進她的老房子。她手裡永遠握著那把黑雨傘——
+      <i>“Each of the hikers brought an umbrella <b>in case</b> it rained.”</i>——被打到一下就結束了。<br><br>
+      <b>【兩關】</b>第一關逃出<b>阿嬤的家</b>，第二關再逃出<b>阿嬤的地下室</b>（更暗、阿嬤更快）。<br><br>
+      <b>【玩法】</b>走到家具前按 <b>E</b>（手機按右下大圓鈕）翻找，每次翻找答一題英文。<br>
+      答對 → 拿道具或線索；答錯 → <b style="color:#e0344a">巨大聲響，阿嬤立刻衝過來</b>。<br>
+      找齊三樣道具 → 走到大門 → 通過最後考驗就過關。<br><br>
+      <b>【🌂 備用雨傘】</b>撐開它可以<b>無敵 8 秒</b>，阿嬤打你會被彈飛並昏 4 秒。
+      藏在家具裡，<b>連續答對 3 題</b>也會拿到一把。按 <b>Q</b> 或左下藍鈕使用。<br><br>
+      <b>【存檔】</b>遊戲會自動存在這台裝置上，關掉網頁下次可以接著玩。
     </div>
     <div class="row">
       <button class="btn" id="btnStart">開始逃脫</button>
-      <button class="btn ghost" id="btnEasy">簡單模式（阿嬤慢一點）</button>
+      <button class="btn blue" id="btnResume" style="display:none">繼續遊戲</button>
+      <button class="btn ghost" id="btnEasy">簡單模式</button>
     </div>
-    <div class="sub" style="margin-top:14px;font-size:12px">鍵盤：WASD／方向鍵移動・Shift 跑・E 互動</div>
+    <div class="sub" style="margin-top:14px;font-size:12px">
+      鍵盤：WASD／方向鍵移動・Shift 跑・E 互動・Q 撐傘　|　手機：左半邊拖曳搖桿，推到底就是跑
+      <br><span id="saveInfo" style="color:#7d6c88"></span>
+      <button class="btn ghost" id="btnClear" style="display:none;margin-top:8px;padding:6px 14px;font-size:12px">清除存檔</button>
+    </div>
   </div>
 
   <!-- CAUGHT -->
@@ -168,6 +187,15 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
     <h2 id="caughtTitle">被雨傘打中了！</h2>
     <div class="sub" id="caughtMsg"></div>
     <button class="btn" id="btnNextDay">醒來，繼續逃</button>
+  </div>
+
+  <!-- LEVEL CLEAR -->
+  <div class="screen" id="scLevel">
+    <div class="granny-art">🚪🏃</div>
+    <h2 id="lvTitle">第一關過關！</h2>
+    <div class="sub" id="lvMsg"></div>
+    <div class="card" id="lvCard"></div>
+    <button class="btn blue" id="btnNextLevel">進入第二關</button>
   </div>
 
   <!-- WIN / OVER -->
@@ -185,7 +213,8 @@ canvas{display:block; image-rendering:pixelated; touch-action:none; background:#
   <!-- QUIZ -->
   <div id="quiz">
     <div id="qbox">
-      <div id="qtop"><span class="tag" id="qtag">單字</span><div id="tbarwrap"><div id="tbar"></div></div><span id="qtime">25</span></div>
+      <div id="qtop"><span class="tag" id="qtag">單字</span><span id="streakTag"></span>
+        <div id="tbarwrap"><div id="tbar"></div></div><span id="qtime">25</span></div>
       <div id="qsrc"></div>
       <div id="qtext"></div>
       <div id="opts"></div>
@@ -345,45 +374,96 @@ const TAGNAME={v:"單字",g:"文法",c:"克漏字"};
 const SRCNAME={v:"L2 單字・片語",g:"L2 文法：it 與 there 的句型",c:"L2 克漏字・文意選填"};
 
 /* ============================================================
-   地圖
+   道具
    ============================================================ */
-const MAP=[
-"##############################",
-"#.............#..............#",
-"#.............#..............#",
-"#.............#..............#",
-"#.............#..............#",
-"#.............#..............#",
-"#............................#",
-"#####.##############.#########",
-"#............................#",
-"#............................#",
-"###.#########.##########.#####",
-"#........#.........#.........#",
-"#........#.........#.........#",
-"#........#.........#.........#",
-"#........#.........#.........#",
-"#........#.........#.........#",
-"##############################"];
-const MW=MAP[0].length, MH=MAP.length, T=32;
-const EXIT={x:29,y:8};              // 走廊盡頭的大門
-const ROOMS=[
- {n:"客廳",x:1,y:1,w:13,h:6},{n:"廚房",x:15,y:1,w:14,h:6},
- {n:"走廊",x:1,y:8,w:28,h:2},
- {n:"臥室",x:1,y:11,w:8,h:5},{n:"浴室",x:10,y:11,w:9,h:5},{n:"儲藏室",x:20,y:11,w:9,h:5}];
+const ITEMS={
+  hammer:["🔨","鐵鎚"], key:["🗝️","大門鑰匙"], code:["🔢","密碼紙條"],
+  phone:["📱","你的手機"], umb:["🌂","備用雨傘"],
+  wrench:["🔧","扳手"], bkey:["🔑","銅鑰匙"], batt:["🔋","電池"], candle:["🕯️","蠟燭"]
+};
 
-const FURN=[
- {x:3,y:2,i:"🛋️",n:"沙發",t:"v"},   {x:11,y:1,i:"📚",n:"書架",t:"g"},
- {x:2,y:5,i:"📺",n:"電視櫃",t:"v"},  {x:12,y:5,i:"🕰️",n:"老時鐘",t:"g"},
- {x:16,y:1,i:"🧊",n:"冰箱",t:"v"},   {x:27,y:1,i:"🗄️",n:"櫥櫃",t:"g"},
- {x:17,y:5,i:"🍳",n:"爐台",t:"c"},   {x:25,y:4,i:"🍽️",n:"餐桌",t:"v"},
- {x:10,y:9,i:"🧥",n:"衣帽架",t:"c"}, {x:17,y:8,i:"🖼️",n:"阿嬤的畫像",t:"g"},
- {x:2,y:12,i:"🛏️",n:"床",t:"v",hide:1}, {x:7,y:11,i:"🧳",n:"衣櫃",t:"g",hide:1},
- {x:6,y:15,i:"🪑",n:"書桌",t:"c"},
- {x:11,y:12,i:"🛁",n:"浴缸",t:"c"},  {x:17,y:14,i:"🚰",n:"洗手台",t:"v"},
- {x:11,y:15,i:"🧺",n:"洗衣機",t:"g"},
- {x:22,y:12,i:"🧰",n:"工具箱",t:"v"},{x:27,y:15,i:"🔐",n:"保險箱",t:"g"},
- {x:25,y:13,i:"📦",n:"木箱",t:"c"}];
+/* ============================================================
+   關卡
+   ============================================================ */
+const LEVELS=[
+{
+  id:1, name:"阿嬤的家", sub:"一樓・客廳、廚房、臥室、浴室、儲藏室",
+  map:[
+  "##############################",
+  "#.............#..............#",
+  "#.............#..............#",
+  "#.............#..............#",
+  "#.............#..............#",
+  "#............................#",
+  "#............................#",
+  "####...############...########",
+  "#............................#",
+  "#............................#",
+  "##...#######...########...####",
+  "#........#.........#.........#",
+  "#........#.........#.........#",
+  "#............................#",
+  "#........#.........#.........#",
+  "#........#.........#.........#",
+  "##############################"],
+  rooms:[{n:"客廳",x:1,y:1,w:13,h:6},{n:"廚房",x:15,y:1,w:14,h:6},{n:"走廊",x:1,y:8,w:28,h:2},
+         {n:"臥室",x:1,y:11,w:8,h:5},{n:"浴室",x:10,y:11,w:9,h:5},{n:"儲藏室",x:20,y:11,w:9,h:5}],
+  spawn:{x:4.5,y:13.5}, gspawn:{x:22.5,y:3.5}, exit:{x:29,y:8}, exitName:"大門",
+  need:["hammer","key","code"], bonus:["phone","umb"], finals:3, light:230, gspeed:2.55,
+  wp:[[22,3],[20,8],[24,12],[13,13],[4,13],[5,8],[6,3],[11,5],[26,14],[3,2]],
+  furn:[
+   {x:3,y:2,i:"🛋️",n:"沙發",t:"v"},   {x:11,y:1,i:"📚",n:"書架",t:"g"},
+   {x:2,y:5,i:"📺",n:"電視櫃",t:"v"},  {x:12,y:5,i:"🕰️",n:"老時鐘",t:"g"},
+   {x:16,y:1,i:"🧊",n:"冰箱",t:"v"},   {x:27,y:1,i:"🗄️",n:"櫥櫃",t:"g"},
+   {x:17,y:5,i:"🍳",n:"爐台",t:"c"},   {x:25,y:4,i:"🍽️",n:"餐桌",t:"v"},
+   {x:10,y:9,i:"🧥",n:"衣帽架",t:"c"}, {x:17,y:8,i:"🖼️",n:"阿嬤的畫像",t:"g"},
+   {x:2,y:12,i:"🛏️",n:"床",t:"v",hide:1}, {x:7,y:11,i:"🧳",n:"衣櫃",t:"g",hide:1},
+   {x:6,y:15,i:"🪑",n:"書桌",t:"c"},
+   {x:11,y:12,i:"🛁",n:"浴缸",t:"c"},  {x:17,y:14,i:"🚰",n:"洗手台",t:"v"},
+   {x:11,y:15,i:"🧺",n:"洗衣機",t:"g"},
+   {x:22,y:12,i:"🧰",n:"工具箱",t:"v"},{x:27,y:15,i:"🔐",n:"保險箱",t:"g"},
+   {x:25,y:13,i:"📦",n:"木箱",t:"c"}]
+},
+{
+  id:2, name:"阿嬤的地下室", sub:"環形走廊・儲物室、鍋爐房、洗衣間、酒窖",
+  map:[
+  "##############################",
+  "#............................#",
+  "#............................#",
+  "#..##..#######..#######..##..#",
+  "#..#.........#............#..#",
+  "#............#...............#",
+  "#...............#............#",
+  "#..#............#.........#..#",
+  "#..######..###..###..######..#",
+  "#..######..###..###..######..#",
+  "#..#............#.........#..#",
+  "#............................#",
+  "#............#...............#",
+  "#..##..#######..#######..##..#",
+  "#............................#",
+  "#............................#",
+  "##############################"],
+  rooms:[{n:"儲物室",x:4,y:4,w:9,h:4},{n:"鍋爐房",x:17,y:4,w:9,h:4},
+         {n:"洗衣間",x:4,y:10,w:9,h:3},{n:"酒窖",x:17,y:10,w:9,h:3},
+         {n:"環形走廊",x:1,y:14,w:28,h:2}],
+  spawn:{x:2.5,y:13.5}, gspawn:{x:21.5,y:5.5}, exit:{x:29,y:8}, exitName:"鐵門",
+  need:["wrench","bkey","batt"], bonus:["candle","umb"], finals:4, light:165, gspeed:2.9,
+  wp:[[2,2],[14,1],[27,2],[28,8],[27,14],[14,15],[2,14],[1,8],[8,5],[21,5],[8,11],[21,11],[15,12]],
+  furn:[
+   {x:5,y:4,i:"🗄️",n:"鐵櫃",t:"g"},    {x:11,y:4,i:"📦",n:"紙箱",t:"v"},
+   {x:4,y:6,i:"🧺",n:"舊衣籃",t:"c"},   {x:8,y:7,i:"⚙️",n:"齒輪堆",t:"g"},
+   {x:18,y:4,i:"🛢️",n:"油桶",t:"v"},   {x:24,y:4,i:"🧰",n:"工具架",t:"g"},
+   {x:25,y:6,i:"🪣",n:"水桶",t:"c"},    {x:21,y:7,i:"🔩",n:"零件盒",t:"v"},
+   {x:5,y:10,i:"🧊",n:"冷凍櫃",t:"v"},  {x:11,y:10,i:"📚",n:"舊課本堆",t:"g"},
+   {x:8,y:12,i:"🕸️",n:"蜘蛛網角落",t:"c"},
+   {x:18,y:10,i:"🪑",n:"壞椅子",t:"v"}, {x:24,y:10,i:"🗃️",n:"檔案櫃",t:"g"},
+   {x:21,y:12,i:"🛞",n:"舊輪胎",t:"c"},
+   {x:15,y:7,i:"🔌",n:"配電盤",t:"g"},  {x:14,y:11,i:"🪜",n:"鐵梯",t:"v"},
+   {x:1,y:9,i:"🪞",n:"舊鏡子",t:"c"},   {x:28,y:12,i:"⚱️",n:"罈子",t:"v"},
+   {x:5,y:1,i:"🧯",n:"滅火器",t:"c"},   {x:24,y:1,i:"🖼️",n:"舊相框",t:"g"},
+   {x:12,y:15,i:"🛏️",n:"行軍床",t:"v",hide:1}, {x:20,y:15,i:"🧳",n:"大皮箱",t:"g",hide:1}]
+}];
 
 const JUNK=["裡面只有一疊舊報紙。","一張泛黃的照片：年輕的阿嬤，手裡也拿著那把傘。",
  "空的。但你聽見樓上有腳步聲…","一本筆記寫著：You inspire me to connect with others.",
@@ -395,39 +475,107 @@ const TAUNT=["You can't deny it… 你逃不掉的。","Don't take it personally
  "There is no telling how this ends…","It is no use running!","Come here! 我們來 hang out 一下。",
  "I'm so disappointed with you…","Focus! 專心一點被我打比較不痛。"];
 
-/* ============================================================
-   遊戲狀態
-   ============================================================ */
+const T=32, SAVEKEY="granny_escape_save_v3";
 const cv=document.getElementById("cv"), ctx=cv.getContext("2d");
 const $=id=>document.getElementById(id);
-let G=null, easy=false, last=0, raf=0;
+let G=null, easy=false, last=0, raf=0, MAP=null, MW=30, MH=17, LV=LEVELS[0];
 
+/* ============================================================
+   地圖工具
+   ============================================================ */
 function solidAt(x,y){
   if(x<0||y<0||x>=MW||y>=MH) return true;
   if(MAP[y][x]==="#") return true;
-  if(x===EXIT.x&&y===EXIT.y) return true;
-  return G ? G.furn.some(f=>f.x===x&&f.y===y) : FURN.some(f=>f.x===x&&f.y===y);
+  if(x===LV.exit.x&&y===LV.exit.y) return true;
+  return G ? G.furn.some(f=>f.x===x&&f.y===y) : false;
 }
-function passable(x,y){return !solidAt(x,y);}
+const passable=(x,y)=>!solidAt(x,y);
 
-function newGame(){
-  const furn=FURN.map(f=>({...f,opened:false,loot:null}));
-  // 隨機把四樣道具藏進不同家具
+function bfs(sx,sy,tx,ty){
+  sx|=0;sy|=0;tx|=0;ty|=0;
+  if(sx===tx&&sy===ty) return [];
+  const prev=new Int32Array(MW*MH).fill(-1), seen=new Uint8Array(MW*MH);
+  const q=[sy*MW+sx]; seen[sy*MW+sx]=1;
+  const D=[[1,0],[-1,0],[0,1],[0,-1]];
+  let head=0, goal=ty*MW+tx, found=false;
+  while(head<q.length){
+    const c=q[head++], cx=c%MW, cy=(c/MW)|0;
+    if(c===goal){found=true;break;}
+    for(const[dx,dy]of D){
+      const nx=cx+dx, ny=cy+dy, n=ny*MW+nx;
+      if(nx<0||ny<0||nx>=MW||ny>=MH||seen[n]) continue;
+      if(!passable(nx,ny)&&!(nx===tx&&ny===ty)) continue;
+      seen[n]=1; prev[n]=c; q.push(n);
+    }
+  }
+  if(!found) return [];
+  const path=[]; let c=goal;
+  while(c!==-1&&c!==sy*MW+sx){ path.push({x:c%MW,y:(c/MW)|0}); c=prev[c]; }
+  return path.reverse();
+}
+function los(ax,ay,bx,by){
+  const d=Math.hypot(bx-ax,by-ay), st=Math.ceil(d*3);
+  for(let i=1;i<st;i++){
+    const x=ax+(bx-ax)*i/st, y=ay+(by-ay)*i/st;
+    if(MAP[Math.floor(y)] && MAP[Math.floor(y)][Math.floor(x)]==="#") return false;
+  }
+  return true;
+}
+
+/* ============================================================
+   建立 / 存檔
+   ============================================================ */
+function useLevel(n){
+  LV=LEVELS[n]; MAP=LV.map; MW=MAP[0].length; MH=MAP.length;
+}
+function freshLevelState(n,carry){
+  useLevel(n);
+  const furn=LV.furn.map(f=>({...f,opened:false,loot:null}));
   const idx=furn.map((_,i)=>i).sort(()=>Math.random()-0.5);
-  const loot=[["hammer","🔨","鐵鎚"],["key","🗝️","大門鑰匙"],["code","🔢","密碼紙條"],["phone","📱","你的手機"]];
-  loot.forEach((L,k)=>{furn[idx[k]].loot=L;});
+  const all=LV.need.concat(LV.bonus);
+  all.forEach((k,i)=>{ furn[idx[i]].loot=k; });
+  const items={}; LV.need.concat(LV.bonus).forEach(k=>items[k]=false);
   return {
-    day:1, lives:5, noise:0, over:false,
-    p:{x:4.5,y:13.5,dx:0,dy:0,dir:1,stam:100,hiding:false},
-    g:{x:22.5,y:3.5,state:"patrol",wp:0,path:[],tt:0,target:null,say:"",sayT:0},
-    furn, items:{hammer:false,key:false,code:false,phone:false},
-    doorTried:false, wrong:[], asked:{v:[],g:[],c:[]}, t:0, shake:0, grace:1.6
+    level:n, day:1, lives:5, noise:0, over:false, grace:1.8,
+    p:{x:LV.spawn.x,y:LV.spawn.y,dir:1,stam:100,hiding:false},
+    g:{x:LV.gspawn.x,y:LV.gspawn.y,state:"patrol",wp:0,path:[],tt:0,target:null,say:"",sayT:0,stun:0,face:1},
+    furn, items, umb:(carry&&carry.umb)||0, shield:0, streak:0, lightBonus:0,
+    wrong:(carry&&carry.wrong)||[], asked:(carry&&carry.asked)||{v:[],g:[],c:[]},
+    t:0, shake:0
   };
 }
+function saveGame(){
+  if(!G||G.over) return;
+  try{
+    localStorage.setItem(SAVEKEY, JSON.stringify({
+      v:3, level:G.level, day:G.day, lives:G.lives, items:G.items, umb:G.umb,
+      streak:G.streak, lightBonus:G.lightBonus, easy,
+      f:G.furn.map(f=>(f.opened?1:0)+(f.loot?":"+f.loot:"")),
+      wrong:G.wrong.slice(-60), asked:G.asked, ts:Date.now()
+    }));
+  }catch(e){}
+}
+function loadSave(){ try{ return JSON.parse(localStorage.getItem(SAVEKEY)||"null"); }catch(e){ return null; } }
+function clearSave(){ try{ localStorage.removeItem(SAVEKEY); }catch(e){} }
 
-/* ---------- 出題（同類不重覆，用完才重來） ---------- */
+function restore(s){
+  easy=!!s.easy;
+  G=freshLevelState(s.level|0,{umb:s.umb|0,wrong:s.wrong||[],asked:s.asked||{v:[],g:[],c:[]}});
+  G.day=s.day||1; G.lives=s.lives||5; G.streak=s.streak||0; G.lightBonus=s.lightBonus||0;
+  if(s.items) Object.keys(G.items).forEach(k=>{ if(s.items[k]) G.items[k]=true; });
+  (s.f||[]).forEach((v,i)=>{
+    if(!G.furn[i]) return;
+    const parts=String(v).split(":");
+    G.furn[i].opened=parts[0]==="1";
+    G.furn[i].loot=parts[1]||null;
+  });
+  buildSlots(); syncHUD();
+}
+
+/* ---------- 出題 ---------- */
 function pick(type){
   const pool=BANK[type];
+  if(!G.asked[type]) G.asked[type]=[];
   if(G.asked[type].length>=pool.length) G.asked[type]=[];
   let i; do{ i=Math.floor(Math.random()*pool.length); }while(G.asked[type].includes(i));
   G.asked[type].push(i);
@@ -452,73 +600,80 @@ function sfx(f,d,type="square",v=.06,slide=0){
 }
 const sOpen=()=>sfx(320,.12,"triangle",.05,120);
 const sGood=()=>{sfx(660,.1,"triangle",.07);setTimeout(()=>sfx(990,.16,"triangle",.07),90);};
-const sBad =()=>{sfx(180,.3,"sawtooth",.09,-120);};
-const sHit =()=>{sfx(90,.5,"sawtooth",.12,-60);};
+const sBad =()=>sfx(180,.3,"sawtooth",.09,-120);
+const sHit =()=>sfx(90,.5,"sawtooth",.12,-60);
 const sWin =()=>{[523,659,784,1047].forEach((f,i)=>setTimeout(()=>sfx(f,.22,"triangle",.08),i*130));};
+const sShield=()=>{[440,660,880].forEach((f,i)=>setTimeout(()=>sfx(f,.18,"sine",.08),i*70));};
+const sBounce=()=>{sfx(760,.14,"square",.09,-380);setTimeout(()=>sfx(240,.25,"sawtooth",.07,-120),90);};
 let beatT=0;
 function heartbeat(dist,dt){
   beatT-=dt;
-  if(dist<7 && beatT<=0){ sfx(60,.12,"sine",.10); beatT=Math.max(.28,dist*.09); }
+  if(dist<7 && beatT<=0 && G.shield<=0){ sfx(60,.12,"sine",.10); beatT=Math.max(.28,dist*.09); }
 }
 
 /* ============================================================
-   BFS 尋路
-   ============================================================ */
-function bfs(sx,sy,tx,ty){
-  sx|=0;sy|=0;tx|=0;ty|=0;
-  if(sx===tx&&sy===ty) return [];
-  const prev=new Int32Array(MW*MH).fill(-1), seen=new Uint8Array(MW*MH);
-  const q=[sy*MW+sx]; seen[sy*MW+sx]=1;
-  const D=[[1,0],[-1,0],[0,1],[0,-1]];
-  let head=0, goal=ty*MW+tx, found=false;
-  while(head<q.length){
-    const c=q[head++], cx=c%MW, cy=(c/MW)|0;
-    if(c===goal){found=true;break;}
-    for(const[dx,dy]of D){
-      const nx=cx+dx, ny=cy+dy, n=ny*MW+nx;
-      if(nx<0||ny<0||nx>=MW||ny>=MH||seen[n]) continue;
-      if(!passable(nx,ny)&&!(nx===tx&&ny===ty)) continue;
-      seen[n]=1; prev[n]=c; q.push(n);
-    }
-  }
-  if(!found) return [];
-  const path=[]; let c=goal;
-  while(c!==-1&&c!==sy*MW+sx){ path.push({x:c%MW,y:(c/MW)|0}); c=prev[c]; }
-  return path.reverse();
-}
-function los(ax,ay,bx,by){          // 視線是否被牆擋住
-  const d=Math.hypot(bx-ax,by-ay), st=Math.ceil(d*3);
-  for(let i=1;i<st;i++){
-    const x=ax+(bx-ax)*i/st, y=ay+(by-ay)*i/st;
-    if(MAP[Math.floor(y)] && MAP[Math.floor(y)][Math.floor(x)]==="#") return false;
-  }
-  return true;
-}
-
-/* ============================================================
-   輸入
+   輸入：鍵盤
    ============================================================ */
 const keys={};
 addEventListener("keydown",e=>{
   if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)) e.preventDefault();
   keys[e.key.toLowerCase()]=true;
-  if(e.key.toLowerCase()==="e") tryInteract();
+  const k=e.key.toLowerCase();
+  if(k==="e") tryInteract();
+  if(k==="q") useUmbrella();
 });
 addEventListener("keyup",e=>{keys[e.key.toLowerCase()]=false;});
-const touch={x:0,y:0,run:false};
-function bindPad(id,fx,fy){
-  const el=$(id);
-  const on=e=>{e.preventDefault();touch.x=fx;touch.y=fy;};
-  const off=e=>{e.preventDefault();if(touch.x===fx&&touch.y===fy){touch.x=0;touch.y=0;}};
-  el.addEventListener("touchstart",on,{passive:false}); el.addEventListener("touchend",off,{passive:false});
-  el.addEventListener("touchcancel",off,{passive:false});
-  el.addEventListener("mousedown",on); el.addEventListener("mouseup",off); el.addEventListener("mouseleave",off);
+
+/* ============================================================
+   輸入：虛擬搖桿（左半邊任意處拖曳）
+   ============================================================ */
+const joy={id:null,ox:0,oy:0,x:0,y:0,mag:0};
+const stageEl=$("stage"), joyEl=$("joy"), knobEl=$("knob");
+const R=62;
+function joyStart(cx,cy){
+  const r=stageEl.getBoundingClientRect();
+  joy.ox=cx-r.left; joy.oy=cy-r.top; joy.x=0; joy.y=0; joy.mag=0;
+  joyEl.style.left=joy.ox+"px"; joyEl.style.top=joy.oy+"px";
+  knobEl.style.left=joy.ox+"px"; knobEl.style.top=joy.oy+"px";
+  joyEl.classList.add("on"); knobEl.classList.add("on");
 }
-bindPad("pu",0,-1);bindPad("pd",0,1);bindPad("pl",-1,0);bindPad("pr",1,0);
-$("act").addEventListener("touchstart",e=>{e.preventDefault();tryInteract();},{passive:false});
-$("act").addEventListener("click",e=>{e.preventDefault();tryInteract();});
-const runOn=e=>{e.preventDefault();touch.run=!touch.run;$("run").style.background=touch.run?"#5c2b3a":"#241a29";};
-$("run").addEventListener("touchstart",runOn,{passive:false}); $("run").addEventListener("click",runOn);
+function joyMove(cx,cy){
+  const r=stageEl.getBoundingClientRect();
+  let dx=(cx-r.left)-joy.ox, dy=(cy-r.top)-joy.oy;
+  const d=Math.hypot(dx,dy), c=Math.min(d,R);
+  const nx=d?dx/d:0, ny=d?dy/d:0;
+  knobEl.style.left=(joy.ox+nx*c)+"px"; knobEl.style.top=(joy.oy+ny*c)+"px";
+  joy.mag=c/R; joy.x=nx*joy.mag; joy.y=ny*joy.mag;
+  if(joy.mag<0.18){ joy.x=0; joy.y=0; joy.mag=0; }
+}
+function joyEnd(){
+  joy.id=null; joy.x=0; joy.y=0; joy.mag=0;
+  joyEl.classList.remove("on"); knobEl.classList.remove("on");
+}
+stageEl.addEventListener("touchstart",e=>{
+  const r=stageEl.getBoundingClientRect();
+  for(const t of e.changedTouches){
+    if(joy.id===null && (t.clientX-r.left) < r.width*0.62){ joy.id=t.identifier; joyStart(t.clientX,t.clientY); e.preventDefault(); }
+  }
+},{passive:false});
+stageEl.addEventListener("touchmove",e=>{
+  for(const t of e.changedTouches) if(t.identifier===joy.id){ joyMove(t.clientX,t.clientY); e.preventDefault(); }
+},{passive:false});
+const endT=e=>{ for(const t of e.changedTouches) if(t.identifier===joy.id) joyEnd(); };
+stageEl.addEventListener("touchend",endT); stageEl.addEventListener("touchcancel",endT);
+/* 滑鼠也能拖（方便電腦測試） */
+let mouseJoy=false;
+stageEl.addEventListener("mousedown",e=>{ if(e.target===stageEl||e.target===cv){ mouseJoy=true; joyStart(e.clientX,e.clientY); } });
+addEventListener("mousemove",e=>{ if(mouseJoy) joyMove(e.clientX,e.clientY); });
+addEventListener("mouseup",()=>{ if(mouseJoy){ mouseJoy=false; joyEnd(); } });
+
+function btn(el,fn){
+  el.addEventListener("touchstart",e=>{e.preventDefault();e.stopPropagation();fn();},{passive:false});
+  el.addEventListener("mousedown",e=>{e.preventDefault();e.stopPropagation();});
+  el.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();if(!("ontouchstart"in window))fn();});
+}
+btn($("act"),()=>tryInteract());
+btn($("umbBtn"),()=>useUmbrella());
 if(matchMedia("(pointer:coarse)").matches) $("touch").classList.add("on");
 
 /* ============================================================
@@ -526,14 +681,14 @@ if(matchMedia("(pointer:coarse)").matches) $("touch").classList.add("on");
    ============================================================ */
 function nearFurn(){
   if(!G) return null;
-  let best=null,bd=1.25;
+  let best=null,bd=1.45;
   for(const f of G.furn){
     const d=Math.hypot(f.x+.5-G.p.x, f.y+.5-G.p.y);
     if(d<bd){bd=d;best=f;}
   }
   return best;
 }
-function nearDoor(){ return G && Math.hypot(EXIT.x-.2-G.p.x, EXIT.y+.5-G.p.y)<1.4; }
+const nearDoor=()=>G&&Math.hypot(LV.exit.x-.2-G.p.x, LV.exit.y+.5-G.p.y)<1.5;
 
 function tryInteract(){
   if(!G||G.over||quizOpen) return;
@@ -541,21 +696,31 @@ function tryInteract(){
   if(nearDoor()){ openDoor(); return; }
   const f=nearFurn();
   if(!f) return;
-  if(f.hide && G.g.state!=="patrol"){ G.p.hiding=true; G.g.target=null; G.g.state="alert"; toast("你躲進"+f.n+"…屏住呼吸 🤫"); sfx(120,.2,"sine",.05); return; }
-  if(f.opened){ toast(f.n+"已經翻過了。"+(f.hide?"（被追時按 E 可以躲進去）":"")); return; }
+  if(f.hide && (G.g.state!=="patrol"||G.noise>50)){
+    G.p.hiding=true; G.g.target=null; G.g.state="alert";
+    toast("你躲進"+f.n+"…屏住呼吸 🤫"); sfx(120,.2,"sine",.05); return;
+  }
+  if(f.opened){ toast(f.n+"已經翻過了。"+(f.hide?"（被追時按互動鍵可以躲進去）":"")); return; }
   openQuiz(f);
 }
 function openDoor(){
-  const need=[];
-  if(!G.items.hammer)need.push("🔨 鐵鎚");
-  if(!G.items.key)need.push("🗝️ 鑰匙");
-  if(!G.items.code)need.push("🔢 密碼紙條");
-  if(need.length){ toast("大門被木板釘死、上鎖、還有密碼鎖。<br>你還缺：<b>"+need.join("、")+"</b>"); sfx(140,.2,"square",.05); return; }
+  const need=LV.need.filter(k=>!G.items[k]).map(k=>ITEMS[k][0]+" "+ITEMS[k][1]);
+  if(need.length){ toast(LV.exitName+"被釘死、上鎖、還有密碼鎖。<br>你還缺：<b>"+need.join("、")+"</b>"); sfx(140,.2,"square",.05); return; }
   startFinal();
 }
 
+/* ---------- 🌂 備用雨傘：無敵 ---------- */
+function useUmbrella(){
+  if(!G||G.over||quizOpen) return;
+  if(G.shield>0){ toast("傘已經撐開了！"); return; }
+  if(G.umb<=0){ toast("你沒有備用雨傘。<br>翻家具找找，或<b>連續答對 3 題</b>就會拿到一把。"); return; }
+  G.umb--; G.shield=8; G.p.hiding=false;
+  toast("🌂 <b>你撐開了備用雨傘！無敵 8 秒</b> —— just in case!");
+  sShield(); syncHUD(); saveGame();
+}
+
 /* ============================================================
-   小提示
+   提示
    ============================================================ */
 let toastT=0;
 function toast(html,ms=2600){
@@ -571,7 +736,8 @@ function openQuiz(f,after,forced){
   quizOpen=true; qAfter=after||null;
   qData=forced||pick(f?f.t:"v");
   $("qtag").textContent=TAGNAME[qData.type];
-  $("qsrc").textContent=(f?("🔍 你正在翻找「"+f.n+"」　|　"):"🚪 最終考驗　|　")+SRCNAME[qData.type];
+  $("streakTag").textContent=G.streak>0?("🔥 連對 "+G.streak):"";
+  $("qsrc").textContent=(f?("🔍 你正在翻找「"+f.n+"」　|　"):("🚪 "+LV.exitName+"・最終考驗　|　"))+SRCNAME[qData.type];
   $("qtext").textContent=qData.text;
   $("exp").classList.remove("on"); $("btnNext").style.display="none";
   const box=$("opts"); box.innerHTML="";
@@ -600,46 +766,62 @@ function answer(i,f){
     if(k===qData.ans)b.classList.add("correct");
     else if(k===i)b.classList.add("wrong");
   });
+  let extra="";
+  if(ok){
+    G.streak++;
+    if(G.streak>0 && G.streak%3===0 && G.umb<3){
+      G.umb++; extra="<br>🔥 <b style='color:#6bb8e8'>連續答對 3 題！獲得一把 🌂 備用雨傘</b>";
+    }
+  }else{
+    G.streak=0;
+    G.wrong.push({q:qData.text,a:qData.opts[qData.ans],e:qData.exp});
+  }
   const e=$("exp");
   e.innerHTML=(ok?"✅ <b style='color:#4ad07a'>答對了！</b>":(i<0?"⏰ <b style='color:#e0344a'>時間到！</b>":"❌ <b style='color:#e0344a'>答錯了。</b>"))
-    +"　正解：<b>"+qData.opts[qData.ans]+"</b><br>💡 "+qData.exp;
+    +"　正解：<b>"+qData.opts[qData.ans]+"</b><br>💡 "+qData.exp+extra;
   e.classList.add("on");
   $("btnNext").style.display="block";
-  if(ok) sGood(); else { sBad(); G.wrong.push({q:qData.text,a:qData.opts[qData.ans],e:qData.exp}); }
+  if(ok) sGood(); else sBad();
   qData.result=ok; qData.furn=f;
+  syncHUD();
 }
 $("btnNext").onclick=()=>{
   $("quiz").classList.remove("on"); quizOpen=false;
   const ok=qData.result, f=qData.furn;
-  if(qAfter){ const cb=qAfter; qAfter=null; cb(ok); return; }
-  if(ok){
+  if(qAfter){ const cb=qAfter; qAfter=null; cb(ok); saveGame(); return; }
+  if(ok&&f){
     f.opened=true; G.noise=Math.min(100,G.noise+12);
     if(f.loot){
-      const[k,ic,nm]=f.loot; G.items[k]=true; $("s_"+k).classList.add("on");
+      const k=f.loot, ic=ITEMS[k][0], nm=ITEMS[k][1];
+      G.items[k]=true;
       if(k==="phone"){ G.lives++; toast("📱 找到你的手機了！<b>多撐一天</b>（+1 天）"); }
+      else if(k==="umb"){ G.umb=Math.min(3,G.umb+1); toast("🌂 找到<b>備用雨傘</b>！按 Q（或藍鈕）可以無敵 8 秒。"); }
+      else if(k==="candle"){ G.lightBonus=95; toast("🕯️ 點亮蠟燭！<b>看得更遠了</b>。"); }
       else toast("你拿到了 "+ic+" <b>"+nm+"</b>！");
-      sWin();
+      sWin(); buildSlots();
     }else{
       toast("🔍 "+JUNK[Math.floor(Math.random()*JUNK.length)]);
     }
   }else{
-    // 答錯＝翻倒東西 → 巨大聲響
     G.noise=100; alertGranny(true);
     toast("💥 <b style='color:#e0344a'>你打翻了東西，巨大聲響！</b>阿嬤朝你衝過來了！");
   }
+  syncHUD(); saveGame();
 };
 
-/* ---------- 最終考驗（3 題：單字＋文法＋克漏字） ---------- */
+/* ---------- 最終考驗 ---------- */
 function startFinal(){
-  finalStep=0; toast("🚪 大門的三道鎖亮了起來…答對三題就能逃出去！",2000);
+  finalStep=0;
+  toast("🚪 "+LV.exitName+"的鎖亮了起來…答對 "+LV.finals+" 題就能逃出去！",2000);
   setTimeout(nextFinal,700);
 }
 function nextFinal(){
-  const types=["v","g","c"];
-  const q=(finalStep===2)
+  const types=["v","g","c","g"];
+  const isLast=(finalStep===LV.finals-1);
+  const q=isLast
     ? {type:"c",text:"Each of the hikers brought an umbrella and a raincoat ____ it rained.（阿嬤的雨傘之謎）",
-       opts:["in fact","in case","in addition","in relation"],ans:1,exp:"in case 以防萬一 —— 原來阿嬤永遠帶著傘，是怕下雨。"}
-    : pick(types[finalStep]);
+       opts:["in fact","in case","in addition","in relation"],ans:1,exp:"in case 以防萬一 —— 原來阿嬤永遠帶著傘，是怕下雨。你的備用雨傘也是這樣來的。"}
+    : pick(types[finalStep%4]);
   openQuiz(null,(ok)=>{
     if(!ok){
       G.noise=100; alertGranny(true);
@@ -647,7 +829,7 @@ function nextFinal(){
       return;
     }
     finalStep++;
-    if(finalStep>=3){ win(); }
+    if(finalStep>=LV.finals){ levelClear(); }
     else { toast("🔓 第 "+finalStep+" 道鎖打開了！",1400); setTimeout(nextFinal,900); }
   },q);
 }
@@ -662,49 +844,58 @@ function alertGranny(chase){
   G.g.say=TAUNT[Math.floor(Math.random()*TAUNT.length)]; G.g.sayT=3;
   sfx(200,.5,"sawtooth",.07,-150);
 }
+function bounceGranny(){
+  const g=G.g, p=G.p;
+  let dx=g.x-p.x, dy=g.y-p.y, d=Math.hypot(dx,dy)||1;
+  dx/=d; dy/=d;
+  for(let k=4;k>=1;k--){
+    const nx=g.x+dx*k, ny=g.y+dy*k;
+    if(passable(Math.floor(nx),Math.floor(ny))){ g.x=nx; g.y=ny; break; }
+  }
+  g.stun=4; g.state="alert"; g.path=[]; g.target=null;
+  g.say="Ouch! 我的傘…"; g.sayT=3;
+  G.shake=.45; sBounce();
+  toast("🌂 <b>你用傘擋住了阿嬤！</b>她被彈飛，昏了 4 秒 —— 快跑！");
+}
 function updateGranny(dt){
   const g=G.g, p=G.p;
   const dist=Math.hypot(p.x-g.x,p.y-g.y);
+  if(g.stun>0){ g.stun-=dt; if(g.sayT>0)g.sayT-=dt; heartbeat(dist,dt); return dist; }
   const canSee=!p.hiding && dist<8 && los(g.x,g.y,p.x,p.y);
   if(canSee && g.state!=="chase"){ g.state="chase"; g.say=TAUNT[Math.floor(Math.random()*TAUNT.length)]; g.sayT=2.5; }
   if(g.state==="chase"){
-    if(canSee){ g.target={x:Math.floor(p.x),y:Math.floor(p.y)}; }
-    else if(!g.target || (Math.abs(g.x-g.target.x-.5)<.5&&Math.abs(g.y-g.target.y-.5)<.5)){
-      g.state="alert";
-    }
+    if(canSee) g.target={x:Math.floor(p.x),y:Math.floor(p.y)};
+    else if(!g.target||(Math.abs(g.x-g.target.x-.5)<.5&&Math.abs(g.y-g.target.y-.5)<.5)) g.state="alert";
   }
   if(g.state==="alert"){
-    if(!g.target||(Math.abs(g.x-g.target.x-.5)<.6&&Math.abs(g.y-g.target.y-.5)<.6)){
-      g.state="patrol"; g.target=null; g.say="";
-    }
+    if(!g.target||(Math.abs(g.x-g.target.x-.5)<.6&&Math.abs(g.y-g.target.y-.6)<.6)){ g.state="patrol"; g.target=null; g.say=""; }
   }
   if(g.state==="patrol"){
-    const WP=[[22,3],[20,8],[24,12],[13,13],[4,13],[5,8],[6,3],[11,5],[26,14],[3,2]];
+    const WP=LV.wp;
     if(!g.target){ g.wp=(g.wp+1)%WP.length; g.target={x:WP[g.wp][0],y:WP[g.wp][1]}; }
-    if(Math.hypot(g.x-g.target.x-.5,g.y-g.target.y-.5)<.6){ g.target=null; }
+    if(Math.hypot(g.x-g.target.x-.5,g.y-g.target.y-.5)<.6) g.target=null;
   }
-  // 重新規劃路線
   g.tt-=dt;
   if(g.tt<=0 && g.target){ g.path=bfs(g.x,g.y,g.target.x,g.target.y); g.tt=0.45; }
-  // 移動
-  const base=easy?2.0:2.55;
+  const base=(easy?LV.gspeed*0.8:LV.gspeed);
   const spd=(g.state==="chase"?base*1.42:base)*dt;
   if(g.path&&g.path.length){
     const n=g.path[0], tx=n.x+.5, ty=n.y+.5;
     const dx=tx-g.x, dy=ty-g.y, d=Math.hypot(dx,dy);
-    if(d<.12){ g.path.shift(); }
-    else { g.x+=dx/d*spd; g.y+=dy/d*spd; g.face=dx>0?1:(dx<0?-1:(g.face||1)); }
+    if(d<.12) g.path.shift();
+    else { g.x+=dx/d*spd; g.y+=dy/d*spd; if(dx>0.02)g.face=1; else if(dx<-0.02)g.face=-1; }
   }
   if(g.sayT>0) g.sayT-=dt;
-  // 抓到
-  if(!p.hiding && dist<0.62 && !quizOpen && G.grace<=0) caught();
-  // 心跳
+  if(!p.hiding && dist<0.66 && !quizOpen){
+    if(G.shield>0) bounceGranny();
+    else if(G.grace<=0) caught();
+  }
   heartbeat(dist,dt);
   return dist;
 }
 
 /* ============================================================
-   被抓 / 勝負
+   被抓 / 過關 / 結束
    ============================================================ */
 function caught(){
   if(G.over) return;
@@ -716,29 +907,49 @@ function caught(){
     $("caughtTitle").textContent="🌂 被雨傘打中了！";
     $("caughtMsg").innerHTML="你昏了過去…醒來已是第 <b>"+G.day+"</b> 天。<br>已經找到的道具還留著，繼續找！<br><span style='color:#a294ae'>剩餘天數："+G.lives+"</span>";
     $("scCaught").classList.add("on");
+    G.over=true;
   },450);
 }
 $("btnNextDay").onclick=()=>{
   $("scCaught").classList.remove("on");
-  G.over=false; G.noise=0; G.grace=2.2;
-  G.p.x=4.5;G.p.y=13.5;G.p.hiding=false;G.p.stam=100;
-  G.g.x=22.5;G.g.y=3.5;G.g.state="patrol";G.g.target=null;G.g.path=[];G.g.say="";
-  syncHUD();
+  G.over=false; G.noise=0; G.grace=2.4; G.shield=0;
+  G.p.x=LV.spawn.x; G.p.y=LV.spawn.y; G.p.hiding=false; G.p.stam=100;
+  G.g.x=LV.gspawn.x; G.g.y=LV.gspawn.y; G.g.state="patrol"; G.g.target=null; G.g.path=[]; G.g.say=""; G.g.stun=0;
+  syncHUD(); saveGame();
 };
-function win(){
+function levelClear(){
   G.over=true; sWin();
+  if(G.level<LEVELS.length-1){
+    $("lvTitle").textContent="第一關過關！";
+    $("lvMsg").innerHTML="你撞開"+LV.exitName+"衝出去 —— 但樓梯往<b>下</b>，不是往外。";
+    $("lvCard").innerHTML="門後是一段石階。你聽見身後傘尖敲地的聲音…<br><br>"+
+      "<b>第二關：阿嬤的地下室</b><br>・環形走廊，四個房間，更容易被堵死<br>・光線更暗（找到 🕯️ 蠟燭可以看更遠）<br>"+
+      "・阿嬤走得更快<br>・要找 🔧 扳手、🔑 銅鑰匙、🔋 電池，最後考 <b>4 題</b><br><br>"+
+      "帶進第二關的東西：🌂 備用雨傘 ×"+G.umb+"　|　天數重新算 5 天。";
+    $("scLevel").classList.add("on");
+    const carry={umb:G.umb,wrong:G.wrong,asked:G.asked};
+    $("btnNextLevel").onclick=()=>{
+      $("scLevel").classList.remove("on");
+      G=freshLevelState(1,carry);
+      buildSlots(); syncHUD(); fitCanvas(); saveGame();
+      toast("你在環形走廊醒來。地下室好暗…",3200);
+    };
+  } else win();
+}
+function win(){
+  G.over=true; sWin(); clearSave();
   $("endArt").textContent="🚪✨🏃";
-  $("endTitle").textContent="逃出來了！";
-  $("endMsg").innerHTML="你在第 <b>"+G.day+"</b> 天逃出恐怖阿嬤的家。<br>"+
-    (G.items.phone?"而且手機也拿回來了 📱":"（手機還在阿嬤那裡…）")+
-    "<br>答錯題數：<b>"+G.wrong.length+"</b>";
+  $("endTitle").textContent="真的逃出來了！";
+  $("endMsg").innerHTML="你逃出了阿嬤的地下室，外面是天亮的街道。<br>"+
+    (G.items.phone?"手機也拿回來了 📱 —— 但也許，該學 Sally 跟它說聲 goodbye。":"")+
+    "<br>總答錯題數：<b>"+G.wrong.length+"</b>";
   showWrong(); $("scEnd").classList.add("on");
 }
 function lose(){
-  G.over=true;
+  G.over=true; clearSave();
   $("endArt").textContent="👵🌂💀";
   $("endTitle").textContent="五天到了…";
-  $("endMsg").innerHTML="阿嬤把你「解決」了。<br>“Don't take it personally.” 她說。<br>答錯題數：<b>"+G.wrong.length+"</b>";
+  $("endMsg").innerHTML="阿嬤把你「解決」了。<br>“Don't take it personally.” 她說。<br>總答錯題數：<b>"+G.wrong.length+"</b>";
   showWrong(); $("scEnd").classList.add("on");
 }
 function showWrong(){
@@ -753,23 +964,22 @@ function showWrong(){
    繪圖
    ============================================================ */
 function fitCanvas(){
-  const st=$("stage"), r=st.getBoundingClientRect();
+  const r=stageEl.getBoundingClientRect();
   const dpr=Math.min(2,devicePixelRatio||1);
   cv.width=Math.floor(r.width*dpr); cv.height=Math.floor(r.height*dpr);
   cv.style.width=r.width+"px"; cv.style.height=r.height+"px";
   ctx.setTransform(dpr,0,0,dpr,0,0);
   cv._w=r.width; cv._h=r.height;
 }
-addEventListener("resize",()=>{fitCanvas();});
+addEventListener("resize",fitCanvas);
 
 function draw(){
   const W=cv._w,H=cv._h;
   ctx.clearRect(0,0,W,H); ctx.fillStyle="#050409"; ctx.fillRect(0,0,W,H);
   if(!G) return;
-  // 鏡頭
   const wantTiles = W<620 ? 12 : 19;
   let sc = Math.min(W/(wantTiles*T), H/(9.5*T));
-  sc = Math.max(sc, Math.min(W/(MW*T), H/(MH*T)));
+  sc = Math.max(sc, H/(MH*T), W/(MW*T));   // 不要讓地圖外露出黑邊
   const vw=W/sc, vh=H/sc;
   let camx=G.p.x*T-vw/2, camy=G.p.y*T-vh/2;
   camx=Math.max(0,Math.min(MW*T-vw,camx)); camy=Math.max(0,Math.min(MH*T-vh,camy));
@@ -778,31 +988,29 @@ function draw(){
   const shk=G.shake>0?(Math.random()-.5)*10*G.shake:0;
   ctx.save(); ctx.scale(sc,sc); ctx.translate(-camx+shk,-camy+shk);
 
-  // 地板 + 牆
+  const base=G.level===0?["#241a2b","#2f2237","#1a1220"]:["#1e2430","#28303e","#141922"];
   for(let y=0;y<MH;y++)for(let x=0;x<MW;x++){
     const px=x*T,py=y*T;
     if(MAP[y][x]==="#"){
-      ctx.fillStyle="#241a2b"; ctx.fillRect(px,py,T,T);
-      ctx.fillStyle="#2f2237"; ctx.fillRect(px+1,py+1,T-2,T/2-2);
-      ctx.fillStyle="#1a1220"; ctx.fillRect(px,py+T-3,T,3);
+      ctx.fillStyle=base[0]; ctx.fillRect(px,py,T,T);
+      ctx.fillStyle=base[1]; ctx.fillRect(px+1,py+1,T-2,T/2-2);
+      ctx.fillStyle=base[2]; ctx.fillRect(px,py+T-3,T,3);
     }else{
-      ctx.fillStyle=((x+y)%2)?"#161020":"#120d1a"; ctx.fillRect(px,py,T,T);
+      ctx.fillStyle=G.level===0?(((x+y)%2)?"#161020":"#120d1a"):(((x+y)%2)?"#121820":"#0e131a");
+      ctx.fillRect(px,py,T,T);
       ctx.strokeStyle="rgba(255,255,255,.02)"; ctx.strokeRect(px+.5,py+.5,T-1,T-1);
     }
   }
-  // 房名
   ctx.font="600 13px 'PingFang TC',sans-serif"; ctx.textAlign="center";
-  ROOMS.forEach(r=>{ ctx.fillStyle="rgba(190,170,205,.18)"; ctx.fillText(r.n,(r.x+r.w/2)*T,(r.y+r.h/2)*T+4); });
+  LV.rooms.forEach(r=>{ ctx.fillStyle="rgba(190,170,205,.18)"; ctx.fillText(r.n,(r.x+r.w/2)*T,(r.y+r.h/2)*T+4); });
 
-  // 大門
-  const ex=EXIT.x*T, ey=EXIT.y*T;
-  const allItems=G.items.hammer&&G.items.key&&G.items.code;
-  ctx.fillStyle=allItems?"#6b4a1e":"#3a2a1c"; ctx.fillRect(ex,ey,T,T);
-  ctx.fillStyle=allItems?"#c79a4a":"#5a4530"; ctx.fillRect(ex+3,ey+3,T-6,T-6);
-  ctx.font="16px serif"; ctx.fillText(allItems?"🚪":"🔒",ex+T/2,ey+T/2+6);
-  if(allItems){ ctx.strokeStyle="rgba(255,181,71,"+(0.35+0.3*Math.sin(G.t*4))+")"; ctx.lineWidth=2; ctx.strokeRect(ex-1,ey-1,T+2,T+2); }
+  const ex=LV.exit.x*T, ey=LV.exit.y*T;
+  const ready=LV.need.every(k=>G.items[k]);
+  ctx.fillStyle=ready?"#6b4a1e":"#3a2a1c"; ctx.fillRect(ex,ey,T,T);
+  ctx.fillStyle=ready?"#c79a4a":"#5a4530"; ctx.fillRect(ex+3,ey+3,T-6,T-6);
+  ctx.font="16px serif"; ctx.fillText(ready?"🚪":"🔒",ex+T/2,ey+T/2+6);
+  if(ready){ ctx.strokeStyle="rgba(255,181,71,"+(0.35+0.3*Math.sin(G.t*4))+")"; ctx.lineWidth=2; ctx.strokeRect(ex-1,ey-1,T+2,T+2); }
 
-  // 家具
   ctx.font="19px serif";
   G.furn.forEach(f=>{
     const px=f.x*T,py=f.y*T;
@@ -812,24 +1020,20 @@ function draw(){
     if(f.opened){ ctx.strokeStyle="rgba(74,208,122,.5)";ctx.lineWidth=1.5;ctx.strokeRect(px+2.5,py+3.5,T-5,T-6); }
   });
 
-  // 玩家
   drawPlayer(G.p.x*T,G.p.y*T);
-  // 阿嬤
   drawGranny(G.g.x*T,G.g.y*T);
 
-  // 黑暗
-  const lightR=G.p.hiding?90:230;
+  const lightR=(G.p.hiding?90:LV.light+G.lightBonus)+(G.shield>0?40:0);
   const grd=ctx.createRadialGradient(G.p.x*T,G.p.y*T,14,G.p.x*T,G.p.y*T,lightR);
-  grd.addColorStop(0,"rgba(0,0,0,0)"); grd.addColorStop(.55,"rgba(0,0,0,.18)"); grd.addColorStop(1,"rgba(0,0,0,.78)");
+  grd.addColorStop(0,"rgba(0,0,0,0)"); grd.addColorStop(.55,"rgba(0,0,0,.18)"); grd.addColorStop(1,"rgba(0,0,0,.80)");
   ctx.fillStyle=grd; ctx.fillRect(camx-10,camy-10,vw+20,vh+20);
-  // 阿嬤的紅光（就算在暗處也看得到一點）
+
   const d=Math.hypot(G.p.x-G.g.x,G.p.y-G.g.y);
   if(d<12){
     const gg=ctx.createRadialGradient(G.g.x*T,G.g.y*T,2,G.g.x*T,G.g.y*T,70);
     gg.addColorStop(0,"rgba(224,52,74,"+(0.30*(1-d/12))+")"); gg.addColorStop(1,"rgba(224,52,74,0)");
     ctx.fillStyle=gg; ctx.fillRect(G.g.x*T-70,G.g.y*T-70,140,140);
   }
-  // 台詞
   if(G.g.sayT>0&&G.g.say){
     ctx.font="600 12px 'PingFang TC',sans-serif"; ctx.textAlign="center";
     const w=ctx.measureText(G.g.say).width+16;
@@ -837,73 +1041,77 @@ function draw(){
     ctx.strokeStyle="#8c2136"; ctx.lineWidth=1; ctx.strokeRect(G.g.x*T-w/2,G.g.y*T-44,w,20);
     ctx.fillStyle="#ffc9d2"; ctx.fillText(G.g.say,G.g.x*T,G.g.y*T-30);
   }
-  // 互動提示
-  const f=nearFurn();
   if(!quizOpen){
+    const f=nearFurn();
     let hint=null;
-    if(G.p.hiding) hint="按 E 出來";
-    else if(nearDoor()) hint="按 E 開門";
-    else if(f) hint=f.opened?(f.hide?"E 躲進去":"已翻過"):("E 搜查 "+f.n);
+    if(G.p.hiding) hint="互動鍵：出來";
+    else if(nearDoor()) hint="互動鍵：開"+LV.exitName;
+    else if(f) hint=f.opened?(f.hide?"互動鍵：躲進去":"已翻過"):("互動鍵：搜查 "+f.n);
     if(hint){
       ctx.font="600 12px 'PingFang TC',sans-serif"; ctx.textAlign="center";
       const w=ctx.measureText(hint).width+16;
-      ctx.fillStyle="rgba(10,8,14,.9)"; ctx.fillRect(G.p.x*T-w/2,G.p.y*T-42,w,20);
-      ctx.strokeStyle="#ffb547"; ctx.strokeRect(G.p.x*T-w/2,G.p.y*T-42,w,20);
-      ctx.fillStyle="#ffd9a0"; ctx.fillText(hint,G.p.x*T,G.p.y*T-28);
+      ctx.fillStyle="rgba(10,8,14,.9)"; ctx.fillRect(G.p.x*T-w/2,G.p.y*T-44,w,20);
+      ctx.strokeStyle="#ffb547"; ctx.strokeRect(G.p.x*T-w/2,G.p.y*T-44,w,20);
+      ctx.fillStyle="#ffd9a0"; ctx.fillText(hint,G.p.x*T,G.p.y*T-30);
     }
   }
   ctx.restore();
 
-  // 方向指示（阿嬤在畫面外時）
   if(d>4){
     const ang=Math.atan2(G.g.y-G.p.y,G.g.x-G.p.x);
-    const cxp=W/2, cyp=H/2, r=Math.min(W,H)*0.34;
-    ctx.save(); ctx.translate(cxp+Math.cos(ang)*r, cyp+Math.sin(ang)*r); ctx.rotate(ang);
+    const r=Math.min(W,H)*0.34;
+    ctx.save(); ctx.translate(W/2+Math.cos(ang)*r, H/2+Math.sin(ang)*r); ctx.rotate(ang);
     ctx.globalAlpha=Math.max(.15,Math.min(.75,1-(d-4)/12));
     ctx.fillStyle="#e0344a"; ctx.beginPath(); ctx.moveTo(10,0); ctx.lineTo(-6,-6); ctx.lineTo(-6,6); ctx.closePath(); ctx.fill();
     ctx.restore(); ctx.globalAlpha=1;
   }
 }
 function drawPlayer(px,py){
-  if(G.p.hiding){
-    ctx.globalAlpha=.4;
-  }
+  if(G.p.hiding) ctx.globalAlpha=.4;
   ctx.save(); ctx.translate(px,py);
+  if(G.shield>0){
+    const a=0.35+0.25*Math.sin(G.t*9);
+    ctx.strokeStyle="rgba(107,184,232,"+a+")"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.arc(0,0,20,0,7); ctx.stroke();
+    ctx.fillStyle="rgba(107,184,232,.12)"; ctx.beginPath(); ctx.arc(0,0,20,0,7); ctx.fill();
+    ctx.fillStyle="#2b5f85";
+    ctx.beginPath(); ctx.moveTo(-14,-14); ctx.quadraticCurveTo(0,-30,14,-14);
+    ctx.quadraticCurveTo(7,-18,0,-14); ctx.quadraticCurveTo(-7,-18,-14,-14); ctx.fill();
+  }
   ctx.fillStyle="rgba(0,0,0,.4)"; ctx.beginPath(); ctx.ellipse(0,11,9,4,0,0,7); ctx.fill();
-  ctx.fillStyle="#2f6ea8"; ctx.fillRect(-7,-4,14,15);          // 外套
+  ctx.fillStyle="#2f6ea8"; ctx.fillRect(-7,-4,14,15);
   ctx.fillStyle="#1f4d76"; ctx.fillRect(-7,8,14,4);
-  ctx.fillStyle="#f2c9a0"; ctx.beginPath(); ctx.arc(0,-9,7,0,7); ctx.fill();   // 頭
+  ctx.fillStyle="#f2c9a0"; ctx.beginPath(); ctx.arc(0,-9,7,0,7); ctx.fill();
   ctx.fillStyle="#241a1a"; ctx.beginPath(); ctx.arc(0,-11,7,Math.PI,0); ctx.fill();
   ctx.fillStyle="#1a1a1a";
   ctx.fillRect(G.p.dir>0?1:-4,-10,3,2); ctx.fillRect(G.p.dir>0?-4:1,-10,2,2);
   ctx.restore(); ctx.globalAlpha=1;
 }
 function drawGranny(px,py){
-  const chase=G.g.state==="chase";
+  const chase=G.g.state==="chase", stun=G.g.stun>0;
   ctx.save(); ctx.translate(px,py);
   ctx.fillStyle="rgba(0,0,0,.45)"; ctx.beginPath(); ctx.ellipse(0,12,10,4,0,0,7); ctx.fill();
-  const sway=Math.sin(G.t*(chase?14:6))*(chase?3:1.2);
+  const sway=stun?Math.sin(G.t*22)*10:Math.sin(G.t*(chase?14:6))*(chase?3:1.2);
   ctx.rotate(sway*Math.PI/180);
-  // 洋裝
   ctx.fillStyle=chase?"#61122a":"#43243a";
   ctx.beginPath(); ctx.moveTo(-6,-3); ctx.lineTo(6,-3); ctx.lineTo(10,13); ctx.lineTo(-10,13); ctx.closePath(); ctx.fill();
   ctx.fillStyle="rgba(255,255,255,.07)"; ctx.fillRect(-6,-3,12,4);
-  // 頭 + 白髮
   ctx.fillStyle="#e6cbb2"; ctx.beginPath(); ctx.arc(0,-10,7.5,0,7); ctx.fill();
   ctx.fillStyle="#dcd6e0"; ctx.beginPath(); ctx.arc(0,-13,7.5,Math.PI,0); ctx.fill();
-  ctx.beginPath(); ctx.arc(0,-19,4,0,7); ctx.fill();             // 髮髻
-  // 眼睛
-  ctx.fillStyle=chase?"#ff2b42":"#5a1220";
-  ctx.beginPath(); ctx.arc(-3,-10,1.8,0,7); ctx.arc(3,-10,1.8,0,7); ctx.fill();
-  if(chase){ ctx.fillStyle="rgba(255,43,66,.35)"; ctx.beginPath(); ctx.arc(-3,-10,4,0,7); ctx.arc(3,-10,4,0,7); ctx.fill(); }
+  ctx.beginPath(); ctx.arc(0,-19,4,0,7); ctx.fill();
+  ctx.fillStyle=stun?"#7a6a20":(chase?"#ff2b42":"#5a1220");
+  if(stun){ ctx.font="10px serif"; ctx.textAlign="center"; ctx.fillText("✖ ✖",0,-8); }
+  else{
+    ctx.beginPath(); ctx.arc(-3,-10,1.8,0,7); ctx.arc(3,-10,1.8,0,7); ctx.fill();
+    if(chase){ ctx.fillStyle="rgba(255,43,66,.35)"; ctx.beginPath(); ctx.arc(-3,-10,4,0,7); ctx.arc(3,-10,4,0,7); ctx.fill(); }
+  }
   ctx.fillStyle="#7a1020"; ctx.fillRect(-2,-6,4,2);
-  // 🌂 雨傘（她的武器）
-  const face=(G.g.face||1);
-  ctx.save(); ctx.translate(face*11,0); ctx.rotate(face*(chase?-0.9:-0.25));
+  const face=G.g.face||1;
+  ctx.save(); ctx.translate(face*11,0); ctx.rotate(face*(stun?1.4:(chase?-0.9:-0.25)));
   ctx.strokeStyle="#2a2028"; ctx.lineWidth=2.5;
-  ctx.beginPath(); ctx.moveTo(0,-6); ctx.lineTo(0,14); ctx.stroke();       // 傘柄
-  ctx.beginPath(); ctx.arc(-3,14,3,0,Math.PI); ctx.stroke();               // 彎柄
-  ctx.fillStyle=chase?"#8c1024":"#1e1a24";                                 // 傘面
+  ctx.beginPath(); ctx.moveTo(0,-6); ctx.lineTo(0,14); ctx.stroke();
+  ctx.beginPath(); ctx.arc(-3,14,3,0,Math.PI); ctx.stroke();
+  ctx.fillStyle=chase?"#8c1024":"#1e1a24";
   ctx.beginPath(); ctx.moveTo(-11,-6); ctx.quadraticCurveTo(0,-18,11,-6);
   ctx.quadraticCurveTo(5.5,-9,0,-6); ctx.quadraticCurveTo(-5.5,-9,-11,-6); ctx.fill();
   ctx.fillStyle="#3a2b3f"; ctx.fillRect(-1,-20,2,4);
@@ -912,17 +1120,38 @@ function drawGranny(px,py){
 }
 
 /* ============================================================
-   主迴圈
+   HUD
    ============================================================ */
+function buildSlots(){
+  const box=$("items"); box.innerHTML="";
+  LV.need.concat(LV.bonus.filter(k=>k!=="umb")).forEach(k=>{
+    const d=document.createElement("div");
+    d.className="slot"+(G&&G.items[k]?" on":""); d.title=ITEMS[k][1]; d.textContent=ITEMS[k][0];
+    box.appendChild(d);
+  });
+  $("lvPill").textContent=(G&&G.level===1)?"第二關・地下室":"第一關・阿嬤的家";
+}
 function syncHUD(){
+  if(!G) return;
   $("day").textContent=G.day; $("lives").textContent=G.lives;
   $("noise").style.width=G.noise+"%";
+  $("umbN").textContent=G.umb; $("umbBtnN").textContent=G.umb;
+  $("umbPill").classList.toggle("hot",G.shield>0);
+  $("umbBtn").classList.toggle("off",G.umb<=0&&G.shield<=0);
+  const slots=$("items").children, ks=LV.need.concat(LV.bonus.filter(k=>k!=="umb"));
+  ks.forEach((k,i)=>{ if(slots[i]) slots[i].classList.toggle("on",!!G.items[k]); });
   const st=$("state");
-  if(G.p.hiding){ st.textContent="🫥 躲藏中"; st.style.color="#9fd7ff"; }
+  if(G.shield>0){ st.textContent="🌂 無敵 "+G.shield.toFixed(1)+"s"; st.style.color="#6bb8e8"; }
+  else if(G.g.stun>0){ st.textContent="💫 阿嬤昏了 "+G.g.stun.toFixed(1)+"s"; st.style.color="#ffb547"; }
+  else if(G.p.hiding){ st.textContent="🫥 躲藏中"; st.style.color="#9fd7ff"; }
   else if(G.g.state==="chase"){ st.textContent="🏃‍♀️ 阿嬤追來了！"; st.style.color="#e0344a"; }
   else if(G.g.state==="alert"){ st.textContent="👀 阿嬤在找你"; st.style.color="#ffb547"; }
   else { st.textContent="🚶‍♀️ 阿嬤在巡邏"; st.style.color="#8fd6a4"; }
 }
+
+/* ============================================================
+   主迴圈
+   ============================================================ */
 function step(ts){
   raf=requestAnimationFrame(step);
   const dt=Math.min(.05,(ts-last)/1000||0); last=ts;
@@ -930,39 +1159,38 @@ function step(ts){
   G.t+=dt;
   if(G.grace>0) G.grace-=dt;
   if(G.shake>0) G.shake=Math.max(0,G.shake-dt*1.6);
+  if(G.shield>0){ G.shield=Math.max(0,G.shield-dt); if(G.shield===0) toast("🌂 傘收起來了…小心！",1600); }
 
   if(!quizOpen && !G.over){
-    // 玩家移動
     let ix=0,iy=0;
     if(keys.arrowleft||keys.a)ix-=1; if(keys.arrowright||keys.d)ix+=1;
     if(keys.arrowup||keys.w)iy-=1; if(keys.arrowdown||keys.s)iy+=1;
-    ix+=touch.x; iy+=touch.y;
     if(ix||iy){ const m=Math.hypot(ix,iy); ix/=m; iy/=m; }
-    if(G.p.hiding){ ix=0;iy=0; }
-    const wantRun=(keys.shift||touch.run)&&G.p.stam>0&&(ix||iy);
-    const spd=(wantRun?6.1:3.7)*dt;
-    if(wantRun){ G.p.stam=Math.max(0,G.p.stam-dt*26); G.noise=Math.min(100,G.noise+dt*13); }
-    else G.p.stam=Math.min(100,G.p.stam+dt*13);
-    if(ix) G.p.dir=ix>0?1:-1;
-    moveP(ix*spd,0); moveP(0,iy*spd);
-    // 噪音自然消退；滿了就驚動阿嬤
+    let mag=Math.hypot(ix,iy);
+    if(joy.mag>0){ ix=joy.x; iy=joy.y; mag=joy.mag; }
+    if(G.p.hiding){ ix=0;iy=0;mag=0; }
+    const wantRun=((keys.shift||joy.mag>0.82)&&G.p.stam>0&&mag>0);
+    const spd=(wantRun?6.2:3.9)*Math.min(1,mag||1)*dt;
+    if(wantRun){ G.p.stam=Math.max(0,G.p.stam-dt*24); G.noise=Math.min(100,G.noise+dt*12); }
+    else G.p.stam=Math.min(100,G.p.stam+dt*14);
+    if(Math.abs(ix)>0.05) G.p.dir=ix>0?1:-1;
+    if(mag>0){ const n=Math.hypot(ix,iy)||1; moveP(ix/n*spd,0); moveP(0,iy/n*spd); }
     if(!wantRun) G.noise=Math.max(0,G.noise-dt*6);
     if(G.noise>=100 && G.g.state==="patrol") alertGranny(false);
-
     updateGranny(dt);
     syncHUD();
   }
   draw();
 }
 function moveP(dx,dy){
-  const r=.32, nx=G.p.x+dx, ny=G.p.y+dy;
+  const r=.28;
   const chk=(x,y)=>solidAt(Math.floor(x),Math.floor(y));
   if(dx){
-    const e=nx+(dx>0?r:-r);
+    const nx=G.p.x+dx, e=nx+(dx>0?r:-r);
     if(!chk(e,G.p.y-r)&&!chk(e,G.p.y+r-.01)) G.p.x=nx;
   }
   if(dy){
-    const e=ny+(dy>0?r:-r);
+    const ny=G.p.y+dy, e=ny+(dy>0?r:-r);
     if(!chk(G.p.x-r,e)&&!chk(G.p.x+r-.01,e)) G.p.y=ny;
   }
 }
@@ -970,22 +1198,44 @@ function moveP(dx,dy){
 /* ============================================================
    啟動
    ============================================================ */
-function start(isEasy){
+function begin(){
   clearInterval(qInt); quizOpen=false; qAfter=null; finalStep=0;
   $("quiz").classList.remove("on");
-  easy=isEasy; G=newGame();
-  ["hammer","key","code","phone"].forEach(k=>$("s_"+k).classList.remove("on"));
-  $("scTitle").classList.remove("on"); $("scEnd").classList.remove("on"); $("scCaught").classList.remove("on");
-  syncHUD(); fitCanvas();
-  toast("你在臥室醒來。先翻家具找道具吧！",3200);
+  ["scTitle","scEnd","scCaught","scLevel"].forEach(i=>$(i).classList.remove("on"));
+  buildSlots(); syncHUD(); fitCanvas();
   try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
   if(!raf){ last=performance.now(); raf=requestAnimationFrame(step); }
 }
+function start(isEasy){
+  easy=isEasy; clearSave();
+  G=freshLevelState(0,null);
+  begin();
+  toast("你在臥室醒來。先翻家具找道具吧！",3200);
+  saveGame();
+}
 $("btnStart").onclick=()=>start(false);
 $("btnEasy").onclick=()=>start(true);
-$("btnAgain").onclick=()=>{ $("scEnd").classList.remove("on"); $("scTitle").classList.add("on"); };
-fitCanvas();
+$("btnAgain").onclick=()=>{ $("scEnd").classList.remove("on"); $("scTitle").classList.add("on"); refreshTitle(); };
+$("btnResume").onclick=()=>{
+  const s=loadSave(); if(!s){ start(false); return; }
+  restore(s); begin();
+  toast("繼續上次的進度：第 "+(s.level+1)+" 關・第 "+G.day+" 天",3000);
+};
+$("btnClear").onclick=()=>{ clearSave(); refreshTitle(); toast("存檔已清除。",1800); };
+function refreshTitle(){
+  const s=loadSave();
+  if(s){
+    $("btnResume").style.display="inline-block"; $("btnClear").style.display="inline-block";
+    const t=new Date(s.ts||Date.now());
+    $("saveInfo").textContent="偵測到存檔：第 "+((s.level|0)+1)+" 關・第 "+(s.day||1)+" 天・❤️"+(s.lives||5)+
+      "　("+(t.getMonth()+1)+"/"+t.getDate()+" "+String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0")+")";
+  }else{
+    $("btnResume").style.display="none"; $("btnClear").style.display="none"; $("saveInfo").textContent="";
+  }
+}
+useLevel(0); buildSlots(); refreshTitle(); fitCanvas();
 raf=requestAnimationFrame(step);
+addEventListener("beforeunload",saveGame);
 </script>
 </body>
 </html>
